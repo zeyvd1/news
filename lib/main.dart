@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:news/core/theme/app_colors.dart';
+import 'package:news/features/article/views/article.dart';
+import 'package:news/features/home/view/home_screen.dart';
 import 'package:news/features/onboarding/view/splash_screen.dart';
 
 void main() {

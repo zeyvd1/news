@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:news/core/constants/image_assets.dart';
 import 'package:news/core/widgets/custom_search_field.dart';
 import 'package:news/core/widgets/custon_bottom.dart';
+import 'package:news/features/home/view/home_screen.dart';
 import 'package:news/features/weather/view/weather_screen.dart';
 
 class Mapscreen extends StatelessWidget {
@@ -49,7 +50,7 @@ class Mapscreen extends StatelessWidget {
                      onPressed: () {Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const WeatherScreen(),
+                          builder: (_) => const HomeScreen(),
                         ),
                       );},
                    ),
