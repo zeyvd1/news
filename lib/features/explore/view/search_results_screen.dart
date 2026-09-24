@@ -1,193 +1,131 @@
 import 'package:flutter/material.dart';
-import 'package:news/core/theme/app_colors.dart';
-
-class SearchItem {
-  final String title;
-  final String category;
-
-  SearchItem({
-    required this.title,
-    required this.category,
-  });
-}
+import 'explore_screen.dart' show Article, articles, categories;
 
 class SearchResultsScreen extends StatefulWidget {
-  const SearchResultsScreen({
-    super.key,
-    required this.query,
-  });
-
   final String query;
+  const SearchResultsScreen({super.key, required this.query});
 
   @override
   State<SearchResultsScreen> createState() => _SearchResultsScreenState();
 }
 
 class _SearchResultsScreenState extends State<SearchResultsScreen> {
-  String _filter = 'All';
-
-  final List<SearchItem> results = [
-    SearchItem(
-      title: 'Exploring the World\'s Best Beaches',
-      category: 'Travel',
-    ),
-    SearchItem(
-      title: 'Discovering Hidden Gems Around The World',
-      category: 'Travel',
-    ),
-    SearchItem(
-      title: 'The Future of Artificial Intelligence',
-      category: 'Technology',
-    ),
-    SearchItem(
-      title: 'Top Mobile Development Trends',
-      category: 'Technology',
-    ),
-    SearchItem(
-      title: 'How to Setup Your Workspace',
-      category: 'Business',
-    ),
-    SearchItem(
-      title: 'Remote Work is Changing the Future',
-      category: 'Business',
-    ),
-  ];
+  static const _all = 'All';
+  String _selected = _all;
 
   @override
   Widget build(BuildContext context) {
-    final filtered = _filter == 'All'
-        ? results
-        : results.where((item) => item.category == _filter).toList();
+    final q = widget.query.toLowerCase();
+    final matches =
+        articles.where((a) => a.title.toLowerCase().contains(q)).toList();
 
-    final categories = {
-      'All': results.length,
-      'Travel': results.where((e) => e.category == 'Travel').length,
-      'Technology': results.where((e) => e.category == 'Technology').length,
-      'Business': results.where((e) => e.category == 'Business').length,
-    };
+    final tabs = [_all, ...categories];
+    int count(String c) =>
+        c == _all ? matches.length : matches.where((a) => a.category == c).length;
+
+    final visible =
+        _selected == _all ? matches : matches.where((a) => a.category == _selected).toList();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: AppColors.black,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Search Results',
-          style: TextStyle(
-            color: AppColors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
-      body: Column(
-        children: [
-          SizedBox(
-            height: 42,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              children: categories.entries.map((entry) {
-                final selected = entry.key == _filter;
-
-                return Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _filter = entry.key;
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                      ),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: selected
-                            ? AppColors.primary
-                            : Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      child: Text(
-                        '${entry.key} (${entry.value})',
-                        style: TextStyle(
-                          color: selected
-                              ? Colors.white
-                              : AppColors.black,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
+      body: SafeArea(
+        child: Column(children: [
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Row(children: [
+              IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () => Navigator.pop(context)),
+              const Expanded(
+                child: Text('Search results',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
               ),
-              itemCount: filtered.length,
-              itemBuilder: (context, index) {
-                final item = filtered[index];
-
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(18),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(.05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.title,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      Text(
-                        item.category,
-                        style: const TextStyle(
-                          color: AppColors.grey,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
+              const SizedBox(width: 48),
+            ]),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 34,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              itemCount: tabs.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              itemBuilder: (_, i) {
+                final c = tabs[i];
+                final sel = c == _selected;
+                return GestureDetector(
+                  onTap: () => setState(() => _selected = c),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: sel ? const Color(0xFFE3E8F7) : Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                          color: sel
+                              ? const Color(0xFFE3E8F7)
+                              : const Color(0xFFE5E7EB)),
+                    ),
+                    child: Text('$c (${count(c)})',
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: sel ? FontWeight.w600 : FontWeight.w500)),
                   ),
                 );
               },
             ),
           ),
-        ],
+          const SizedBox(height: 8),
+          Expanded(
+            child: visible.isEmpty
+                ? const Center(child: Text('No results found'))
+                : ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    itemCount: visible.length,
+                    itemBuilder: (_, i) => _tile(visible[i]),
+                  ),
+          ),
+        ]),
       ),
     );
   }
+
+  Widget _tile(Article a) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Row(children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(a.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w600, height: 1.3)),
+                const SizedBox(height: 8),
+                Row(children: [
+                  _img(a.avatar, w: 20, h: 20, r: 10),
+                  const SizedBox(width: 6),
+                  Text('${a.author} · ${a.date}',
+                      style: const TextStyle(
+                          fontSize: 11, color: Color(0xFF6B7280))),
+                ]),
+              ],
+            ),
+          ),
+          const SizedBox(width: 16),
+          _img(a.image, w: 80, h: 58, r: 8),
+        ]),
+      );
+
+  Widget _img(String path, {double? w, double? h, double r = 0}) => ClipRRect(
+        borderRadius: BorderRadius.circular(r),
+        child: Image.asset(path,
+            width: w,
+            height: h,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => Container(
+                width: w, height: h, color: const Color(0xFFE3E5EA))),
+      );
 }

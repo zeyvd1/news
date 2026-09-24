@@ -1,20 +1,63 @@
 import 'package:flutter/material.dart';
-import 'package:news/core/theme/app_colors.dart';
 import 'package:news/core/widgets/app_bottom_nav.dart';
 import 'package:news/features/book_mark/view/bookmark_screen.dart';
 import 'package:news/features/home/view/home_screen.dart';
 import 'package:news/features/weather/view/weather_screen.dart';
+import 'search_screen.dart';
 
+class Article {
+  final String title, author, date, category, image, avatar;
 
-class ExploreItem {
-  final String title;
-  final String category;
-
-  ExploreItem({
-    required this.title,
-    required this.category,
-  });
+  const Article(
+    this.title,
+    this.author,
+    this.date,
+    this.category,
+    this.image,
+    this.avatar,
+  );
 }
+
+const articles = [
+  Article(
+    'Uncovering the Hidden Gems of the Amazon Forest',
+    'Mr. Lana Kub',
+    'May 1, 2023',
+    'Travel',
+    'assets/images/EX1.png',
+    'assets/images/Avatar1.png',
+  ),
+  Article(
+    'Experience the Serenity of Japan\'s Traditional Gardens',
+    'Hilda Friesen',
+    'May 3, 2023',
+    'Travel',
+    'assets/images/ex2.png',
+    'assets/images/Avatar2.png',
+  ),
+  Article(
+    'A Journey Through Time: Discovering the Nile river',
+    'Melissa White',
+    'May 7, 2023',
+    'Travel',
+    'assets/images/ex3.png',
+    'assets/images/avatar3.png',
+  ),
+  Article(
+    'Chasing the Northern Lights: A Winter in Finland',
+    'Jeannie Conn',
+    'May 12, 2023',
+    'Travel',
+    'assets/images/ex4.png',
+    'assets/images/avatar4.png',
+  ),
+];
+
+const categories = [
+  'Travel',
+  'Technology',
+  'Business',
+];
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -24,41 +67,7 @@ class ExploreScreen extends StatefulWidget {
 }
 
 class _ExploreScreenState extends State<ExploreScreen> {
-  static const _categories = [
-    'Travel',
-    'Technology',
-    'Business',
-    'Politics',
-  ];
-
-  String _selected = 'Travel';
-
-  final List<ExploreItem> articles = [
-    ExploreItem(
-      title: 'Exploring the World\'s Best Beaches',
-      category: 'Travel',
-    ),
-    ExploreItem(
-      title: 'Hidden Gems Around The World',
-      category: 'Travel',
-    ),
-    ExploreItem(
-      title: 'The Future of Artificial Intelligence',
-      category: 'Technology',
-    ),
-    ExploreItem(
-      title: 'Flutter Development Trends',
-      category: 'Technology',
-    ),
-    ExploreItem(
-      title: 'Remote Work and Productivity',
-      category: 'Business',
-    ),
-    ExploreItem(
-      title: 'Global Economic Updates',
-      category: 'Politics',
-    ),
-  ];
+  String _selected = categories.first;
 
   void _onNavTap(int index) {
     if (index == 1) return;
@@ -69,9 +78,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
       case 0:
         screen = const HomeScreen();
         break;
+
       case 2:
         screen = const BookmarkScreen();
         break;
+
       default:
         screen = const WeatherScreen();
     }
@@ -84,163 +95,239 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filtered = articles
-        .where((article) => article.category == _selected)
-        .toList();
+    final items =
+        articles.where((a) => a.category == _selected).toList();
+
+    final featured = items.isEmpty ? null : items.first;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                20,
-                12,
-                20,
-                8,
-              ),
-              child: Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween,
+      body: Column(
+        children: [
+          Container(
+            color: const Color(0xFFE8ECF8),
+            child: SafeArea(
+              bottom: false,
+              child: Column(
                 children: [
-                  const Text(
-                    'Explore',
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.black,
+                  Padding(
+                    padding:
+                        const EdgeInsets.fromLTRB(24, 16, 16, 12),
+                    child: Row(
+                      children: [
+                        const Expanded(
+                          child: Text(
+                            'Explore',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.search),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    const SearchScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     ),
                   ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.search,
-                      color: AppColors.black,
+
+                  SizedBox(
+                    height: 34,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                      ),
+                      itemCount: categories.length,
+                      separatorBuilder: (_, _) =>
+                          const SizedBox(width: 8),
+                      itemBuilder: (_, i) {
+                        final c = categories[i];
+                        final sel = c == _selected;
+
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selected = c;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                            ),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: sel
+                                  ? const Color(0xFFE3E8F7)
+                                  : Colors.white,
+                              borderRadius:
+                                  BorderRadius.circular(20),
+                              border: Border.all(
+                                color: sel
+                                    ? const Color(0xFFE3E8F7)
+                                    : const Color(0xFFE5E7EB),
+                              ),
+                            ),
+                            child: Text(
+                              c,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: sel
+                                    ? FontWeight.w600
+                                    : FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
+
+                  const SizedBox(height: 14),
                 ],
               ),
             ),
+          ),
 
-            SizedBox(
-              height: 40,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                ),
-                itemCount: _categories.length,
-                separatorBuilder: (_, __) =>
-                    const SizedBox(width: 10),
-                itemBuilder: (context, index) {
-                  final category = _categories[index];
-                  final selected =
-                      category == _selected;
+          Expanded(
+            child: featured == null
+                ? const Center(
+                    child: Text('No articles'),
+                  )
+                : ListView(
+                    padding: const EdgeInsets.fromLTRB(
+                      24,
+                      20,
+                      24,
+                      24,
+                    ),
+                    children: [
+                      _img(
+                        featured.image,
+                        w: 366,
+                        h: 208,
+                        r: 8,
+                      ),
 
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selected = category;
-                      });
-                    },
-                    child: Container(
-                      padding:
-                          const EdgeInsets.symmetric(
-                        horizontal: 18,
-                      ),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: selected
-                            ? AppColors.dark
-                            : AppColors.chipBg,
-                        borderRadius:
-                            BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        category,
-                        style: TextStyle(
-                          fontSize: 13,
+                      const SizedBox(height: 16),
+
+                      Text(
+                        featured.title,
+                        style: const TextStyle(
+                          fontSize: 24,
                           fontWeight: FontWeight.w600,
-                          color: selected
-                              ? Colors.white
-                              : AppColors.black,
                         ),
                       ),
-                    ),
-                  );
-                },
-              ),
-            ),
 
-            const SizedBox(height: 12),
+                      const SizedBox(height: 10),
 
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.fromLTRB(
-                  20,
-                  8,
-                  20,
-                  100,
-                ),
-                itemCount: filtered.length,
-                itemBuilder: (context, index) {
-                  final article = filtered[index];
+                      _author(featured),
 
-                  return Container(
-                    margin: const EdgeInsets.only(
-                      bottom: 12,
-                    ),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius:
-                          BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black
-                              .withOpacity(.05),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          article.title,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight:
-                                FontWeight.w700,
-                          ),
-                        ),
+                      const SizedBox(height: 14),
 
-                        const SizedBox(height: 8),
-
-                        Text(
-                          article.category,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: AppColors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+                      for (final a in items.skip(1)) _tile(a),
+                    ],
+                  ),
+          ),
+        ],
       ),
 
       bottomNavigationBar: AppBottomNav(
         currentIndex: 1,
         onTap: _onNavTap,
+      ),
+    );
+  }
+
+  Widget _tile(Article a) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
+              children: [
+                Text(
+                  a.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                _author(a),
+              ],
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          _img(
+            a.image,
+            w: 112,
+            h: 80,
+            r: 8,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _author(Article a) {
+    return Row(
+      children: [
+        _img(
+          a.avatar,
+          w: 24,
+          h: 24,
+          r: 12,
+        ),
+
+        const SizedBox(width: 6),
+
+        Text(
+          '${a.author} · ${a.date}',
+          style: const TextStyle(
+            fontSize: 11,
+            color: Color(0xFF6B7280),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _img(
+    String path, {
+    double? w,
+    double? h,
+    double r = 0,
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(r),
+      child: Image.asset(
+        path,
+        width: w,
+        height: h,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Container(
+          width: w,
+          height: h,
+          color: const Color(0xFFE3E5EA),
+        ),
       ),
     );
   }

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:news/core/theme/app_colors.dart';
-import 'package:news/features/explore/view/search_results_screen.dart';
-
+import 'search_results_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -13,55 +11,64 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final _controller = TextEditingController();
 
-  void _search() {
-    if (_controller.text.trim().isEmpty) return;
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => SearchResultsScreen(query: _controller.text.trim()),
-      ),
-    );
-  }
-
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
 
+  void _submit(String value) {
+    final q = value.trim();
+    if (q.isEmpty) return;
+    Navigator.push(context,
+        MaterialPageRoute(builder: (_) => SearchResultsScreen(query: q)));
+  }
+
   @override
   Widget build(BuildContext context) {
+    OutlineInputBorder border(Color c) => OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: c));
+
     return Scaffold(
-      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
+          padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
+          child: Row(children: [
+            Expanded(
+              child: ValueListenableBuilder<TextEditingValue>(
+                valueListenable: _controller,
+                builder: (_, value, __) => TextField(
                   controller: _controller,
                   autofocus: true,
-                  onSubmitted: (_) => _search(),
+                  textInputAction: TextInputAction.search,
+                  onSubmitted: _submit,
+                  style: const TextStyle(fontSize: 14),
                   decoration: InputDecoration(
-                    hintText: 'Search',
-                    prefixIcon: const Icon(Icons.search, color: AppColors.grey),
+                    isDense: true,
                     filled: true,
-                    fillColor: AppColors.chipBg,
+                    fillColor: const Color(0xFFEDEDED),
                     contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
+                    prefixIcon: const Icon(Icons.search,
+                        size: 18, color: Color(0xFF8A8A8E)),
+                    suffixIcon: value.text.isEmpty
+                        ? null
+                        : IconButton(
+                            icon: const Icon(Icons.cancel,
+                                size: 18, color: Color(0xFFB0B0B5)),
+                            onPressed: _controller.clear),
+                    enabledBorder: border(Colors.transparent),
+                    focusedBorder: border(const Color(0xFF5B7CFA)),
                   ),
                 ),
               ),
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel', style: TextStyle(color: AppColors.primary)),
-              ),
-            ],
-          ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel',
+                  style: TextStyle(fontSize: 14, color: Color(0xFF1F2BFF))),
+            ),
+          ]),
         ),
       ),
     );

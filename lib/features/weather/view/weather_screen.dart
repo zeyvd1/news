@@ -60,29 +60,36 @@ class WeatherScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Column(
+         
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Good Morning,', style: TextStyle(fontSize: 14,fontWeight: FontWeight.w400, color: AppColors.grey)),
-                      Text('Ahmed Saber', style: TextStyle(fontSize: 14, color: AppColors.grey)),
-                      SizedBox(height: 2),
-                      Text('Sun 9 April, 2023', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600 , color: AppColors.black)),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Image.asset(AppIcons.sun),
-                      const SizedBox(width: 4),
-                      const Text('Sunny 32°C', style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600)),
-                    ],
-                  ),
-                ],
+              padding: const EdgeInsets.fromLTRB(0, 16, 0, 20),
+              child: Container(
+                width: double.infinity,
+                height: 110,
+              color: AppColors.headerBg,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(height: 20,),
+                        Text('Good Morning,', style: TextStyle(fontSize: 14,fontWeight: FontWeight.w400, color: AppColors.grey)),
+                        Text('Ahmed Saber', style: TextStyle(fontSize: 14, color: AppColors.grey)),
+                        SizedBox(height: 2),
+                        Text('    Sun 9 April, 2023', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600 , color: AppColors.black)),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Image.asset(AppIcons.sun),
+                        const SizedBox(width: 4),
+                        const Text('Sunny 32°C       ', style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600,color: AppColors.grey)),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
             Expanded(
